@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParadoX - view</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="{{ url_for('static', filename='CSS/style.css') }}" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+<body class="body-view">
+    <article class="data-vista">
+        <h2 style="color: #fff;">Tablero de Visualización</h2> 
+        <div class="tablero">
+            <div class="party">
+                <div class="most">
+                    <h1 class="Rubidio">
+                        Items Registrados
+                    </h1>
+                    <img src="{{ url_for('static', filename='IMG/t.gif') }}"  class="img-2">
+                    <h1 class="Rubidio-P2">
+                        {{ count_registros }}
+                    </h1>
+                </div>
+                <div class="most">
+                    <h1 class="Rubidio">
+                        Items Vendidos
+                    </h1>
+                    <img src="{{ url_for('static', filename='IMG/t.gif') }}"  class="img-2"> 
+                    <h1 class="Rubidio-P2">
+                        {{ suma_productos_vendidos }}
+                    </h1>
+                </div>
+                <div class="most">
+                    <h1 class="Rubidio">
+                        Margen de ganancia.
+                    </h1>
+                    <center>
+                        <canvas id="porcentajeChart" data-ingreso="{{ margenG }}" >
+                        </canvas>
+                        <label style="color:#93C383; margin-top:3%;">{{margenG}}%</label>
+                    </center>
+                </div>
+                <div class="most-v">
+                    <h1 class="Rubidio">
+                        Venta generada.
+                    </h1>
+                    <h1>
+                        $ {{ suma_ingreso_bruto }}
+                    </h1>
+                    <img src="{{ url_for('static', filename='IMG/tr.gif') }}"  class="img-2"> 
+                </div>
+            </div>
+            <div class="party">
+                <div class="most">
+                    <div class="party">
+                        <h1 class="Rubidio">
+                            Productos más vendidos
+                            <Label class="Rubidio-P"> 
+                                {{ porcentaje_pmvd }}% 
+                            </Label>
+                        </h1>
+                    </div>
+                    <canvas id="productosMasVendidosChart"></canvas>
+                    <h1 class="Rubidio-s" id="datos-vp">
+                    </h1>
+                </div>
+                <div class="most">
+                    <div class="party">
+                        <h1 class="Rubidio">
+                            Productos menos vendidos
+                            <label class="Rubidio-P">
+                                {{porcentaje_pmvds}}%
+                            </label>
+                        </h1>
+                    </div>
+                    <canvas id="productosMenosVendidosChart"></canvas>
+                    <h1 class="Rubidio-s" id="datos-v">
+                    </h1>
+                </div>
+                <div class="most">
+                    <div class="party">
+                        <h1 class="Rubidio">
+                            Mejores Vendedores
+                            <label class="Rubidio-P">
+                                {{porcentaje_vmvd}}%
+                            </label>
+                        </h1>
+                    </div>
+                    <canvas id="VendeVendidosChart"></canvas>
+                    <h1 class="Rubidio-s" id="datos-vv">
+                    </h1>
+                </div>
+                <div class="most">
+                    <div class="party">
+                        <h1 class="Rubidio">
+                            Clientes Frecuentes
+                            <label class="Rubidio-P">
+                                {{porcentaje_cmfd}}%
+                            </label>
+                        </h1>
+                    </div>
+                    <canvas id="clientesChart"></canvas>
+                    <h1 class="Rubidio-s" id="datos-vc">
+                    </h1>
+                </div>
+                <div class="most">
+                    <h1 class="Rubidio">
+                        Panel de datos
+                        <hr>
+                    </h1>
+                    <button class="btn-pild" id="btn-abrir-popup">
+                        Datos
+                    </button>
+                    <br>
+                    <br>
+                    <a class="btn-pild" href="{{ url_for('regresar_a_formulario') }}" class="btn-pild">Regresar</a>
+
+                </div>
+            </div> 
+            <div class="ana">
+                <div class="party">
+                    <div class="regresión">
+                        {{ graph_html | safe }}
+                    </div>
+                    <div class="most">
+                        <div class="party">
+                            <h1 class="Rubidio">
+                                <p>Resultados Regresión Lineal</p>
+                                <p>Coeficientes: {{ resultados_lineal.coeficientes }}</p>
+                                <p>Intercepto: {{ resultados_lineal.intercepto }}</p>
+                                <p>Error absoluto medio: {{ resultados_lineal.mae }}</p>
+                                <p>Error cuadrático medio: {{ resultados_lineal.mse }}</p>
+                                <p>Raíz del error cuadrático medio: {{ resultados_lineal.rmse }}</p>
+                            </h1>
+                        </div>
+                        <canvas id="productosMasVendidosChart"></canvas>
+                        <h1 class="Rubidio-s" id="datos-vp">
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            <div class="ana">
+                <div class="party">
+                    <div class="regresión">
+                        {{ graphR_html | safe }}
+                    </div>
+                    <div class="most">
+                        <div class="party">
+                            <h1 class="Rubidio">
+                                <p>Resultados Regresión Neuronal</p>
+                                <p>Coeficientes: {{ resultados_neuronal.coeficientes }}</p>
+                                <p>Intercepto: {{ resultados_neuronal.intercepto }}</p>
+                                <p>Error absoluto medio: {{ resultados_neuronal.mae }}</p>
+                                <p>Error cuadrático medio: {{ resultados_neuronal.mse }}</p>
+                                <p>Raíz del error cuadrático medio: {{ resultados_neuronal.rmse }}</p>
+                            </h1>
+                        </div>
+                        <canvas id="productosMasVendidosChart"></canvas>
+                        <h1 class="Rubidio-s" id="datos-vp">
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+    <div class="overlay" id="overlay">
+        <div class="popup" id="popup">
+            <a href="#" id="btn-cerrar-popup" class="btn-cerrar-popup"><i class="fas fa-times">X</i></a>
+            <h1 class="paradox-a" style="color:#F5F5F5">
+                ParadoX
+            </h1>
+            <div class="howl-2  ">
+                <div class="table-view">
+                    {% if not preview_data.empty %}
+                        <table class="table" style="background: #F5F5F5;">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>fecha</th>
+                                    <th>factura</th>
+                                    <th>codigo</th>
+                                    <th>n_articulo</th>
+                                    <th>cantidad</th>
+                                    <th>n_cliente</th>
+                                    <th>vendedor</th>
+                                    <th>area</th>
+                                    <th>precio_prod</th>
+                                    <th>ingreso_bruto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for index, row in preview_data.iterrows() %}
+                                    <tr>
+                                        <td>{{ row['fecha'] }}</td>
+                                        <td>{{ row['factura'] }}</td>
+                                        <td>{{ row['codigo'] }}</td>
+                                        <td>{{ row['n_articulo'] }}</td>
+                                        <td>{{ row['cantidad'] }}</td>
+                                        <td>{{ row['n_cliente'] }}</td>
+                                        <td>{{ row['vendedor'] }}</td>
+                                        <td>{{ row['area'] }}</td>
+                                        <td>{{ row['precio_prod'] }}</td>
+                                        <td>{{ row['ingreso_bruto'] }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No hay datos para mostrar.</p>
+                    {% endif %}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+<script>
+        var productosMasVendidosData = {{ pmvd|default([])|tojson|safe }};
+        
+        var productosMasVendidosLabels = productosMasVendidosData.map(function(item) {
+        return item['n_articulo'];});
+        
+        var productosMasVendidosCantidad = productosMasVendidosData.map(function(item) {
+        return item['cantidad'];});
+        
+        var colores = getRandomColors(productosMasVendidosData.length);  
+    
+        var ctxMasVendidos = document.getElementById('productosMasVendidosChart').getContext('2d');
+        var myChartMasVendidos = new Chart(ctxMasVendidos, {
+        type: 'bar',
+        data: {
+            labels: productosMasVendidosData.map(function(item) { return ''; }), // Utiliza etiquetas vacías para ocultar las etiquetas en el eje X
+            datasets: [{
+                data: productosMasVendidosCantidad,
+                backgroundColor: colores,
+                borderColor: colores.map(color => color.replace('0.2', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                },
+                x: {
+                    display: false // Oculta las etiquetas en el eje X
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false  // Oculta la leyenda predeterminada
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.dataset.label || '';
+                            if (label) {
+                                label += ':';
+                            }
+                            label += context.parsed.y;
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Función para obtener colores aleatorios
+    function getRandomColors(count) {
+        var colors = [];
+        for (var i = 0; i < count; i++) {
+            var color = 'rgba(' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', 0.2)';
+            colors.push(color);
+        }
+        return colors;
+    }
+    
+    // Función para obtener un número entero aleatorio entre min y max (incluidos)
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    // Mostrar nombres y colores fuera del gráfico
+    var datosV = document.getElementById('datos-vp');
+        productosMasVendidosLabels.forEach(function(label, index) {
+            var colorBox = document.createElement('span');
+            colorBox.className = 'color-box';
+            colorBox.style.backgroundColor = colores[index];
+    
+            var legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            legendItem.appendChild(colorBox);
+    
+            var legendText = document.createElement('span');
+            legendText.innerText = label;
+            legendItem.appendChild(legendText);
+    
+            datosV.appendChild(legendItem);
+        });
+</script>
+<script>
+    var productosMenosVendidosData = {{ pmvds|default([])|tojson|safe }};
+    
+    var productosMenosVendidosLabels = productosMenosVendidosData.map(function(item) {
+    return item['n_articulo'];});
+    
+    var productosMenosVendidosCantidad = productosMenosVendidosData.map(function(item) {
+    return item['cantidad'];});
+    
+    var colores = getRandomColors(productosMenosVendidosData.length);  
+
+    var ctxMenosVendidos = document.getElementById('productosMenosVendidosChart').getContext('2d');
+    var myChartMenosVendidos = new Chart(ctxMenosVendidos, {
+    type: 'bar',
+    data: {
+        labels: productosMenosVendidosData.map(function(item) { return ''; }), // Utiliza etiquetas vacías para ocultar las etiquetas en el eje X
+        datasets: [{
+            data: productosMenosVendidosCantidad,
+            backgroundColor: colores,
+            borderColor: colores.map(color => color.replace('0.2', '1')),
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            },
+            x: {
+                display: false // Oculta las etiquetas en el eje X
+            }
+        },
+        plugins: {
+            legend: {
+                display: false  // Oculta la leyenda predeterminada
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        var label = context.dataset.label || '';
+                        if (label) {
+                            label += ':';
+                        }
+                        label += context.parsed.y;
+                        return label;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Función para obtener colores aleatorios
+function getRandomColors(count) {
+    var colors = [];
+    for (var i = 0; i < count; i++) {
+        var color = 'rgba(' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', 0.2)';
+        colors.push(color);
+    }
+    return colors;
+}
+
+// Función para obtener un número entero aleatorio entre min y max (incluidos)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+// Mostrar nombres y colores fuera del gráfico
+var datosV = document.getElementById('datos-v');
+    productosMenosVendidosLabels.forEach(function(label, index) {
+        var colorBox = document.createElement('span');
+        colorBox.className = 'color-box';
+        colorBox.style.backgroundColor = colores[index];
+
+        var legendItem = document.createElement('div');
+        legendItem.className = 'legend-item';
+        legendItem.appendChild(colorBox);
+
+        var legendText = document.createElement('span');
+        legendText.innerText = label;
+        legendItem.appendChild(legendText);
+
+        datosV.appendChild(legendItem);
+    });
+</script>
+<script>
+    var VendeVendidosData = {{ vmvd|default([])|tojson|safe }};
+    
+    var VendeVendidosLabels = VendeVendidosData.map(function(item) {
+    return item['vendedor'];});
+    
+    var VendeVendidosCantidad = VendeVendidosData.map(function(item) {
+    return item['cantidad'];});
+    
+    var colores = getRandomColors(VendeVendidosData.length);  
+
+    var ctxVendidos = document.getElementById('VendeVendidosChart').getContext('2d');
+    var myVendidos = new Chart(ctxVendidos, {
+    type: 'bar',
+    data: {
+        labels: VendeVendidosData.map(function(item) { return ''; }), // Utiliza etiquetas vacías para ocultar las etiquetas en el eje X
+        datasets: [{
+            data: VendeVendidosCantidad,
+            backgroundColor: colores,
+            borderColor: colores.map(color => color.replace('0.2', '1')),
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            },
+            x: {
+                display: false // Oculta las etiquetas en el eje X
+            }
+        },
+        plugins: {
+            legend: {
+                display: false  // Oculta la leyenda predeterminada
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        var label = context.dataset.label || '';
+                        if (label) {
+                            label += ':';
+                        }
+                        label += context.parsed.y;
+                        return label;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Función para obtener colores aleatorios
+function getRandomColors(count) {
+    var colors = [];
+    for (var i = 0; i < count; i++) {
+        var color = 'rgba(' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', 0.2)';
+        colors.push(color);
+    }
+    return colors;
+}
+
+// Función para obtener un número entero aleatorio entre min y max (incluidos)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+// Mostrar nombres y colores fuera del gráfico
+var datosV = document.getElementById('datos-vv');
+    VendeVendidosLabels.forEach(function(label, index) {
+        var colorBox = document.createElement('span');
+        colorBox.className = 'color-box';
+        colorBox.style.backgroundColor = colores[index];
+
+        var legendItem = document.createElement('div');
+        legendItem.className = 'legend-item';
+        legendItem.appendChild(colorBox);
+
+        var legendText = document.createElement('span');
+        legendText.innerText = label;
+        legendItem.appendChild(legendText);
+
+        datosV.appendChild(legendItem);
+    });
+</script>
+<script>
+    var VendeVendidosData = {{ cmfd|default([])|tojson|safe }};
+    
+    var VendeVendidosLabels = VendeVendidosData.map(function(item) {
+    return item['n_cliente'];});
+    
+    var VendeVendidosCantidad = VendeVendidosData.map(function(item) {
+    return item['ingreso_bruto'];});
+    
+    var colores = getRandomColors(VendeVendidosData.length);  
+
+    var ctxVendidos = document.getElementById('clientesChart').getContext('2d');
+    var myVendidos = new Chart(ctxVendidos, {
+    type: 'bar',
+    data: {
+        labels: VendeVendidosData.map(function(item) { return ''; }), // Utiliza etiquetas vacías para ocultar las etiquetas en el eje X
+        datasets: [{
+            data: VendeVendidosCantidad,
+            backgroundColor: colores,
+            borderColor: colores.map(color => color.replace('0.2', '1')),
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            },
+            x: {
+                display: false // Oculta las etiquetas en el eje X
+            }
+        },
+        plugins: {
+            legend: {
+                display: false  // Oculta la leyenda predeterminada
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        var label = context.dataset.label || '';
+                        if (label) {
+                            label += ':';
+                        }
+                        label += context.parsed.y;
+                        return label;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Función para obtener colores aleatorios
+function getRandomColors(count) {
+    var colors = [];
+    for (var i = 0; i < count; i++) {
+        var color = 'rgba(' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', ' + getRandomInt(0, 255) + ', 0.2)';
+        colors.push(color);
+    }
+    return colors;
+}
+
+// Función para obtener un número entero aleatorio entre min y max (incluidos)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+// Mostrar nombres y colores fuera del gráfico
+var datosV = document.getElementById('datos-vc');
+    VendeVendidosLabels.forEach(function(label, index) {
+        var colorBox = document.createElement('span');
+        colorBox.className = 'color-box';
+        colorBox.style.backgroundColor = colores[index];
+
+        var legendItem = document.createElement('div');
+        legendItem.className = 'legend-item';
+        legendItem.appendChild(colorBox);
+
+        var legendText = document.createElement('span');
+        legendText.innerText = label;
+        legendItem.appendChild(legendText);
+
+        datosV.appendChild(legendItem);
+    });
+</script>
+
+<script src="{{ url_for('static', filename='JS/pxp.js') }}"></script>
+</body>
+</html>
